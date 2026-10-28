@@ -1,0 +1,27 @@
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Build
+**/bin/
+**/obj/
+
+# Playwright profile
+**/browser_profile_target/
+**/sessions/
+**/private_debug/
+
+# Sensitive data
+.env
+.env.*
+*.pfx
+*.key
+**/secrets.json
+**/appsettings.Production.json
+
+# Logs
+**/logs/
+*.log

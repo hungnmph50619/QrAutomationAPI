@@ -1,0 +1,6 @@
+@QrAutomationAPI_HostAddress = http://localhost:5222
+
+GET {{QrAutomationAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
