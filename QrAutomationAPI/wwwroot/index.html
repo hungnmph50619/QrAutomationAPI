@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>QR Automation Lab | Dashboard</title>
+<style>
+:root{font-family:Segoe UI,Arial,sans-serif;color-scheme:dark;--bg:#0b1220;--panel:#131f30;--panel2:#17263a;--line:#2b3b53;--text:#f1f5fc;--muted:#a4b5cd;--accent:#5a9cf5;--teal:#36d2b1;--red:#ff7285}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);margin:0;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.layout{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+.sidebar{padding:29px 18px;background:#0f1929;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:30px}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}
+.brand-logo{display:grid;place-items:center;width:39px;height:39px;border-radius:12px;color:#06131d;background:linear-gradient(135deg,#63b7ff,#46e5c0);font-weight:900;font-size:20px}
+.brand strong{font-size:15px;letter-spacing:.4px}
+.brand small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+.side-label{color:#7388a5;font-size:11px;font-weight:750;letter-spacing:2px;padding:0 13px;margin-bottom:9px}
+.navlink{display:flex;align-items:center;gap:10px;border-radius:10px;margin-bottom:5px;padding:12px 13px;color:#9fb3cf;font-size:13px;font-weight:600}
+.navlink svg{width:18px;height:18px;flex:none}
+.navlink:hover{background:#1b2b41;color:#fff}
+.navlink.active{color:#88c3ff;background:#1b304e;border:1px solid #2a4b73}
+.side-bottom{margin-top:auto;border:1px solid #2d4b4d;border-radius:12px;padding:13px;background:#112b31}
+.side-bottom strong{display:block;color:#baf8e3;font-size:12px;margin:2px 0 6px}
+.side-bottom p{margin:0;font-size:11px;line-height:1.6;color:#9bb4b6}
+.main{padding:30px clamp(20px,3.5vw,50px) 50px;max-width:1580px;width:100%;margin:0 auto}
+.header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:27px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;color:#83c5fe;text-transform:uppercase}
+h1{font-size:clamp(25px,2.6vw,34px);line-height:1.15;margin:7px 0 7px;letter-spacing:-.6px}
+.subtitle{font-size:13px;color:var(--muted);margin:0}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:10px 13px;border-radius:50px;border:1px solid var(--line);background:#18263a;color:#c8d7ea;font-size:12px;font-weight:700;white-space:nowrap}
+.dot{background:#8496b2;width:8px;height:8px;border-radius:50%;box-shadow:0 0 0 4px #8296b01b}
+.pill.running .dot{background:#38d9a9;box-shadow:0 0 0 4px #38d9a925}
+.pill.error .dot{background:var(--red);box-shadow:0 0 0 4px #ff728525}
+.intro{background:linear-gradient(108deg,#172e4d,#153044 67%,#133638);border:1px solid #315271;border-radius:15px;padding:20px 23px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.intro strong{font-size:14px}
+.intro p{font-size:12px;line-height:1.65;color:#c7d8e8;margin:7px 0 0;max-width:710px}
+.tag{border:1px solid #477f91;background:#235269;color:#b9f3eb;padding:8px 10px;border-radius:8px;font-size:11px;white-space:nowrap;font-weight:bold}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.metric{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:19px 18px;min-height:116px}
+.metric-label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.metric-label span{font-size:16px}
+.metric-value{font-size:26px;font-weight:800;letter-spacing:-.6px;margin:15px 0 4px;line-height:1}
+.metric-foot{font-size:11px;color:#7f9ab9}
+.metric-value.small{font-size:19px}
+.metric-value.good{color:#59debc}
+.columns{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:20px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:15px;overflow:hidden}
+.card-head{padding:21px 23px 14px;display:flex;justify-content:space-between;gap:12px;align-items:start}
+.card h2{font-size:15px;margin:0 0 7px;font-weight:750}
+.card-note{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.card-body{padding:14px 23px 23px}
+.buttons{display:flex;gap:11px;flex-wrap:wrap;margin-top:2px}
+.btn{border:1px solid var(--line);border-radius:10px;padding:12px 18px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:750;font-size:13px;transition:filter .15s,transform .15s}
+.btn:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.btn-primary{color:#071a2d;border-color:#60b9ff;background:linear-gradient(135deg,#71b4ff,#46d5cb);min-width:172px}
+.btn-secondary{color:#ffb8c2;border-color:#65404e;background:#362734;min-width:142px}
+.btn-ghost{background:#1b2c42;color:#d8e6f7;padding:9px 12px;font-size:12px}
+.state-line{padding:14px 16px;border-radius:10px;background:#0e1a2a;border:1px solid #263c55;margin-top:20px;display:flex;gap:11px;align-items:start;font-size:12px;color:#cad9ec;line-height:1.5;min-height:56px}
+.state-line strong{color:#8ebeff}
+.section-label{font-weight:700;font-size:12px;color:#d2e2f6;margin:19px 0 11px}
+.working{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.working-box{border-radius:11px;background:#16263a;border:1px solid #2b3c55;padding:14px}
+.working-box span{display:block;color:#92abc9;font-size:11px;margin-bottom:8px}
+.working-box strong{font-size:18px}
+.path{border-radius:8px;background:#0b1828;border:1px dashed #3b5270;padding:11px 13px;color:#8ebce9;font:12px Consolas,monospace;word-break:break-all}
+.preview-wrap{border-radius:12px;background:#0e1928;border:1px solid #2b3e55;min-height:258px;display:flex;justify-content:center;align-items:center;overflow:hidden;position:relative}
+.preview-wrap img{width:230px;max-width:90%;height:auto;border-radius:6px;background:white}
+.preview-placeholder{display:grid;justify-items:center;text-align:center;gap:10px;padding:27px;color:#8fa7c3;font-size:12px;line-height:1.6}
+.preview-placeholder svg{width:54px;height:54px;stroke:#6994bd}
+.preview-caption{font-size:11px;color:#8ba4c1;padding:12px 0 1px;line-height:1.55}
+.mini-link{font-size:12px;color:#90c8ff;font-weight:700}
+.log-card{margin-top:20px}
+.log-container{background:#091522;border-top:1px solid var(--line);padding:16px 19px;max-height:300px;min-height:152px;overflow:auto}
+.log-line{display:flex;gap:15px;font:12px/1.7 Consolas,'Courier New',monospace;color:#afc6df;padding:4px 0;border-bottom:1px solid #14253b}
+.log-line:last-child{border:0}
+.log-num{color:#647c9c;min-width:24px;text-align:right}
+.log-empty{color:#8099b8;font-size:12px;margin:14px 0}
+.bottom{margin-top:22px;color:#7691af;font-size:11px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.toast{position:fixed;bottom:22px;right:22px;background:#254265;border:1px solid #4f789f;color:#fff;border-radius:12px;box-shadow:0 16px 40px #0008;padding:13px 18px;max-width:min(420px,90vw);font-size:12px;line-height:1.5;z-index:5}
+.toast.error{background:#572c39;border-color:#aa5b6d}
+a:focus-visible,button:focus-visible{outline:3px solid #86c6ff;outline-offset:3px}
+@media(max-width:1070px){.layout{grid-template-columns:1fr}.sidebar{flex-direction:row;align-items:center;justify-content:space-between;padding:13px 20px}.navlinks{display:flex;gap:5px}.side-label,.side-bottom{display:none}.main{padding:25px 20px 38px}.columns{grid-template-columns:1fr 1fr}}
+@media(max-width:790px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.columns{grid-template-columns:1fr}.header{align-items:start;flex-wrap:wrap}.intro{align-items:start;flex-direction:column}}
+@media(max-width:530px){.brand small{display:none}.brand strong{font-size:13px}.navlink{font-size:0;padding:10px}.navlink svg{width:20px}.metrics{gap:9px}.metric{padding:15px 12px}.metric-value{font-size:22px}.main{padding:19px 12px 30px}.card-head{padding:19px 16px 12px}.card-body{padding:12px 16px 19px}.intro{padding:17px}.working{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-logo">Q</div><div><strong>QR AUTOMATION</strong><small>PLAYWRIGHT LAB • .NET 8</small></div></div>
+    <nav class="navlinks" aria-label="Điều hướng">
+      <div class="side-label">WORKSPACE</div>
+      <a class="navlink active" href="/" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>Dashboard</a>
+      <a class="navlink" href="/swagger" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 3-5 9 5 9M16 3l5 9-5 9M14 2 10 22"/></svg>Swagger API</a>
+      <a class="navlink" href="https://github.com/hungnmph50619/QrAutomationAPI/tree/develop" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-5 2-6-2-7-3m14 6v-4a4 4 0 0 0-1-3c3 0 6-2 6-7 0-1 0-3-2-4 0-2 0-3-1-4 0 0-2 0-4 2a14 14 0 0 0-8 0C4 0 2 0 2 0c-1 1-1 2-1 4C0 5 0 7 0 8c0 5 3 7 6 7-1 1-1 2-1 3v4" transform="translate(1 1) scale(.9)"/></svg>GitHub</a>
+    </nav>
+    <div class="side-bottom"><strong>🔒 Môi trường thử nghiệm</strong><p>Chỉ sử dụng HTTPS localhost. QR mô phỏng; không thao tác tài khoản hoặc cookie đăng nhập thật.</p></div>
+  </aside>
+  <main class="main">
+    <header class="header">
+      <div><div class="eyebrow">Automation Workspace</div><h1>Trung tâm điều khiển</h1><p class="subtitle">Quản lý Playwright worker và theo dõi chu kỳ QR mô phỏng theo thời gian thực.</p></div>
+      <div class="pill" id="connectionPill"><span class="dot"></span><span id="connectionLabel">Đang kết nối...</span></div>
+    </header>
+    <section class="intro" aria-label="Môi trường thử nghiệm">
+      <div><strong>🧪 QR Session Automation Lab</strong><p>Mô phỏng cơ chế QR tự làm mới, persistent browser profile và cookie metadata. Worker chạy cục bộ trên máy, trang quản lý không tải thư viện từ Internet.</p></div>
+      <span class="tag">LOCAL TEST ENVIRONMENT</span>
+    </section>
+    <section class="metrics" aria-label="Chỉ số">
+      <div class="metric"><div class="metric-label"><span>◉</span> Trạng thái worker</div><div id="metricState" class="metric-value small">—</div><div class="metric-foot">Tự cập nhật mỗi 2 giây</div></div>
+      <div class="metric"><div class="metric-label"><span>▣</span> Lần chụp ảnh</div><div id="metricShots" class="metric-value">0</div><div class="metric-foot">Ảnh phần tử QR demo</div></div>
+      <div class="metric"><div class="metric-label"><span>◷</span> Kiểm tra gần nhất</div><div id="metricCheck" class="metric-value small">—</div><div class="metric-foot">Giờ trên thiết bị</div></div>
+      <div class="metric"><div class="metric-label"><span>↻</span> QR đã thay đổi?</div><div id="metricChanged" class="metric-value small">—</div><div class="metric-foot">So sánh SHA-256 hai ảnh</div></div>
+    </section>
+    <div class="columns">
+      <div>
+        <section class="card" aria-labelledby="controlTitle">
+          <div class="card-head"><div><h2 id="controlTitle">Điều khiển Chromium</h2><p class="card-note">Bắt đầu hoặc dừng tác vụ automation trực tiếp từ trình duyệt.</p></div></div>
+          <div class="card-body">
+            <div class="buttons">
+              <button id="startBtn" class="btn btn-primary" type="button">▶&nbsp; Bắt đầu worker</button>
+              <button id="stopBtn" class="btn btn-secondary" type="button" disabled>■&nbsp; Dừng worker</button>
+              <button id="refreshBtn" class="btn btn-ghost" type="button">↻ Làm mới</button>
+            </div>
+            <div class="state-line" aria-live="polite"><strong>●</strong><span id="stateMessage">Chưa kết nối với Web API.</span></div>
+            <p class="section-label">Cấu hình theo dõi</p>
+            <div class="working">
+              <div class="working-box"><span>Chu kỳ chụp QR</span><strong id="pollEvery">12 giây</strong></div>
+              <div class="working-box"><span>Chu kỳ đổi QR demo</span><strong id="qrEvery">20 giây</strong></div>
+            </div>
+            <p class="section-label">Đường dẫn lưu kết quả (trong project)</p>
+            <div class="path">private_debug/qr.png<br>sessions/target_*.json<br>browser_profile_target/</div>
+          </div>
+        </section>
+        <section class="card log-card" aria-labelledby="logTitle">
+          <div class="card-head"><div><h2 id="logTitle">Nhật ký hoạt động</h2><p class="card-note">100 sự kiện gần nhất từ QrWorker.</p></div><button id="logRefreshBtn" class="btn btn-ghost" type="button">↻ Cập nhật</button></div>
+          <div id="logContainer" class="log-container" role="log" aria-live="off"><p class="log-empty">Chưa có nhật ký. Bấm Bắt đầu worker để chạy thử.</p></div>
+        </section>
+      </div>
+      <div>
+        <section class="card" aria-labelledby="previewTitle">
+          <div class="card-head"><div><h2 id="previewTitle">Ảnh QR vừa chụp</h2><p class="card-note">Ảnh mô phỏng từ Chromium trên máy của bạn.</p></div><span class="tag" style="padding:6px 8px">DEMO</span></div>
+          <div class="card-body">
+            <div class="preview-wrap">
+              <div id="previewPlaceholder" class="preview-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM19 14h2M19 18h2M16 20h5"/></svg>
+                <div>Chưa có ảnh QR<br>Hãy bắt đầu worker để chụp ảnh đầu tiên.</div>
+              </div>
+              <img id="previewImage" alt="Hình QR mô phỏng do worker vừa chụp" hidden>
+            </div>
+            <div class="preview-caption">Ảnh này chỉ thuộc bài lab localhost. Dữ liệu phiên đăng nhập thật không được hiển thị hoặc tải qua dashboard.</div>
+            <p class="section-label">Cách thử nghiệm</p>
+            <div style="font-size:12px;line-height:1.85;color:#c2d4eb">
+              <div><strong style="color:#8fc3ff">01</strong> &nbsp; Bấm <strong>Bắt đầu worker</strong></div>
+              <div><strong style="color:#8fc3ff">02</strong> &nbsp; Chromium sẽ mở trang QR demo</div>
+              <div><strong style="color:#8fc3ff">03</strong> &nbsp; Theo dõi ảnh và số lần chụp</div>
+              <div><strong style="color:#8fc3ff">04</strong> &nbsp; Trong Chromium, bấm <strong>Xác nhận đăng nhập demo</strong></div>
+              <div><strong style="color:#8fc3ff">05</strong> &nbsp; Worker sẽ lưu metadata cookie</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <footer class="bottom">
+      <span>QR Automation Lab · ASP.NET Core 8 · Microsoft.Playwright</span>
+      <span>HTTPS localhost • Dữ liệu lab không công khai</span>
+    </footer>
+  </main>
+</div>
+<div id="toast" class="toast" hidden role="status"></div>
+<script>
+(() => {
+  'use strict';
+  const q = id => document.getElementById(id);
+  const startBtn=q('startBtn'),stopBtn=q('stopBtn'),refreshBtn=q('refreshBtn');
+  const terminal=q('logContainer'),img=q('previewImage'),placeholder=q('previewPlaceholder');
+  let inFlight=false, actionBusy=false, lastScreenshotCount=0, currentState='Idle';
+  let toastTimer;
+  function notify(message,isError){
+    const toast=q('toast');
+    toast.textContent=message; toast.classList.toggle('error',Boolean(isError));
+    toast.hidden=false;clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>{toast.hidden=true},4200);
+  }
+  async function getJson(url){
+    const response=await fetch(url,{credentials:'same-origin',cache:'no-store',headers:{'Accept':'application/json'}});
+    if(!response.ok)throw new Error('HTTP '+response.status+' khi gọi '+url);
+    return response.json();
+  }
+  function dateLabel(utc){
+    if(!utc)return '—';
+    const date=new Date(utc);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  function renderStatus(s){
+    const state=String(s.state||'Unknown');
+    currentState=state;
+    const running=['Starting','Running','Stopping'].includes(state);
+    q('metricState').textContent=state;
+    q('metricState').classList.toggle('good',state==='Running'||state==='Completed');
+    q('metricShots').textContent=String(s.screenshotCount||0);
+    q('metricCheck').textContent=dateLabel(s.lastCheckUtc);
+    q('metricChanged').textContent=s.lastQrChanged===true?'Có':s.lastQrChanged===false?'Không':'—';
+    q('stateMessage').textContent=s.message||'Không có thông báo';
+    q('pollEvery').textContent=String(s.intervalSeconds||12)+' giây';
+    q('qrEvery').textContent=String(s.qrRefreshSeconds||20)+' giây';
+    startBtn.disabled=running||actionBusy;
+    stopBtn.disabled=!running||state==='Stopping'||actionBusy;
+    const count=Number(s.screenshotCount)||0;
+    if(count>0 && (count!==lastScreenshotCount||img.hidden)){
+      img.src='/api/worker/qr-preview?tick='+Date.now();
+      lastScreenshotCount=count;
+    }
+    if(count===0 && (state==='Starting'||state==='Idle')){
+      img.hidden=true;placeholder.hidden=false;lastScreenshotCount=0;
+    }
+  }
+  function renderLogs(logs){
+    if(!Array.isArray(logs)||logs.length===0){
+      terminal.replaceChildren();
+      const empty=document.createElement('p');
+      empty.className='log-empty';empty.textContent='Chưa có nhật ký. Bấm Bắt đầu worker để chạy thử.';
+      terminal.appendChild(empty);return;
+    }
+    const fragment=document.createDocumentFragment();
+    logs.slice(-100).forEach((line,index)=>{
+      const row=document.createElement('div');row.className='log-line';
+      const number=document.createElement('span');number.className='log-num';number.textContent=String(index+1).padStart(2,'0');
+      const msg=document.createElement('span');msg.textContent=String(line);
+      row.append(number,msg);fragment.appendChild(row);
+    });
+    terminal.replaceChildren(fragment);
+    terminal.scrollTop=terminal.scrollHeight;
+  }
+  function setConnected(connected){
+    q('connectionPill').classList.toggle('running',connected);
+    q('connectionPill').classList.toggle('error',!connected);
+    q('connectionLabel').textContent=connected?'API đang kết nối':'Mất kết nối API';
+    if(!connected){startBtn.disabled=true;stopBtn.disabled=true;}
+  }
+  async function refresh(){
+    if(inFlight)return;
+    inFlight=true;
+    try{
+      const values=await Promise.all([getJson('/api/worker/status'),getJson('/api/worker/logs')]);
+      renderStatus(values[0]);
+      renderLogs(values[1]);
+      setConnected(true);
+    }catch(error){
+      setConnected(false);
+      q('stateMessage').textContent='Không thể kết nối: '+error.message;
+    }finally{inFlight=false;}
+  }
+  async function action(name){
+    if(actionBusy)return;
+    actionBusy=true;startBtn.disabled=true;stopBtn.disabled=true;
+    try{
+      const response=await fetch('/api/worker/'+name,{method:'POST',credentials:'same-origin',headers:{'Accept':'application/json'}});
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(data.message||('HTTP '+response.status));
+      notify(data.message||(name==='start'?'Đã khởi động':'Đã gửi yêu cầu dừng'),false);
+    }catch(error){notify('Không thực hiện được: '+error.message,true);}
+    finally{actionBusy=false;await refresh();}
+  }
+  img.addEventListener('load',()=>{img.hidden=false;placeholder.hidden=true;});
+  img.addEventListener('error',()=>{img.hidden=true;placeholder.hidden=false;});
+  startBtn.addEventListener('click',()=>action('start'));
+  stopBtn.addEventListener('click',()=>action('stop'));
+  refreshBtn.addEventListener('click',refresh);
+  q('logRefreshBtn').addEventListener('click',refresh);
+  refresh();
+  setInterval(refresh,2000);
+})();
+</script>
+</body>
+</html>
