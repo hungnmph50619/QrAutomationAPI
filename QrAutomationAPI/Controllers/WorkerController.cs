@@ -29,10 +29,21 @@ public sealed class WorkerController : ControllerBase
                 || host == "127.0.0.1");
     }
 
+    // Ngăn website ngoài kích hoạt Start/Stop bằng cross-site form.
+    private bool SameOriginPost()
+    {
+        var origin = Request.Headers.Origin.ToString();
+        var site = Request.Headers["Sec-Fetch-Site"].ToString();
+        var expected = $"{Request.Scheme}://{Request.Host}";
+        return (string.IsNullOrWhiteSpace(origin)
+                || string.Equals(origin, expected, StringComparison.OrdinalIgnoreCase))
+            && (string.IsNullOrWhiteSpace(site) || site is "same-origin" or "none");
+    }
+
     [HttpPost("start")]
     public IActionResult Start()
     {
-        if (!IsLocalHttps()) return NotFound();
+        if (!IsLocalHttps() || !SameOriginPost()) return NotFound();
         string origin = $"{Request.Scheme}://{Request.Host}";
         if (!_worker.TryStart(origin))
             return Conflict(new { Message = "Worker đang chạy hoặc đang dừng" });
@@ -47,7 +58,7 @@ public sealed class WorkerController : ControllerBase
     [HttpPost("stop")]
     public IActionResult Stop()
     {
-        if (!IsLocalHttps()) return NotFound();
+        if (!IsLocalHttps() || !SameOriginPost()) return NotFound();
         return _worker.RequestStop()
             ? Accepted(new { Message = "Đã gửi yêu cầu dừng" })
             : Ok(new { Message = "Không có worker đang chạy" });
@@ -58,6 +69,18 @@ public sealed class WorkerController : ControllerBase
     {
         if (!IsLocalHttps()) return NotFound();
         return Ok(_worker.GetStatus());
+    }
+
+    // Chỉ trả về ảnh QR giả lập của bài lab, qua HTTPS localhost.
+    // File không đặt trong wwwroot và không được cache.
+    [HttpGet("qr-preview")]
+    public IActionResult QrPreview()
+    {
+        if (!IsLocalHttps()) return NotFound();
+        var path = Path.Combine(_env.ContentRootPath, "private_debug", "qr.png");
+        if (!System.IO.File.Exists(path)) return NotFound();
+        Response.Headers.CacheControl = "private, no-store";
+        return PhysicalFile(path, "image/png");
     }
 
     [HttpGet("logs")]
